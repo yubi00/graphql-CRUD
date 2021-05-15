@@ -1,15 +1,6 @@
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
+import { USERS_QUERY } from "../../graphql/queries";
 import ListItem from "./ListItem/ListItem";
-
-const USERS_QUERY = gql`
-  query usersQuery {
-    Users {
-      id
-      name
-      email
-    }
-  }
-`;
 
 const List = () => {
   const { data, loading, error } = useQuery(USERS_QUERY);

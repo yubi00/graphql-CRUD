@@ -1,24 +1,26 @@
-import { useMutation, gql } from "@apollo/client";
-
-const DELETE_MUTATION = gql`
-  mutation deleteMutation($id: String!) {
-    deleteUser(id: $id) {
-      id
-      name
-      email
-    }
-  }
-`;
+import { useMutation } from "@apollo/client";
+import { DELETE_MUTATION } from "../../../graphql/mutations";
+import { USERS_QUERY } from "../../../graphql/queries";
 
 const ListItem = ({ user: { id, name } }) => {
-  const [deleteUser] = useMutation(DELETE_MUTATION, {
-    variables: { id }
-  });
+  const [deleteUser, { loading: mutationLoading, error: mutationError }] =
+    useMutation(DELETE_MUTATION);
+
+  const handleDeleteUser = async () => {
+    await deleteUser({
+      variables: { id },
+      update: (cache, { data: { deleteUser } }) => {
+        cache.writeQuery({ query: USERS_QUERY }, deleteUser);
+      }
+    });
+  };
 
   return (
     <div>
+      {mutationLoading && <p> Loding...</p>}
+      {mutationError && <p> {mutationError.message} </p>}
       <h2>
-        {name} <button onClick={() => deleteUser()}>X</button>
+        {name} <button onClick={handleDeleteUser}>X</button>
       </h2>
     </div>
   );
