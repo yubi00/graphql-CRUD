@@ -1,60 +1,83 @@
 import { useMutation } from "@apollo/client";
 import { useState } from "react";
-import { ADD_MUTATION } from "../../graphql/mutations";
+import { ADD_MUTATION, UPDATE_MUTATION } from "../../graphql/mutations";
 import { USERS_QUERY } from "../../graphql/queries";
 
-const InputForm = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+const InputForm = ({ editing, setEditing }) => {
+  const [name, setName] = useState(editing ? editing.name : "");
+  const [email, setEmail] = useState(editing ? editing.email : "");
 
   const [createUser, { loading: mutationLoading, error: mutationError }] =
     useMutation(ADD_MUTATION);
+  const [updateUser, { loading: updateLoading, error: updateError }] =
+    useMutation(UPDATE_MUTATION);
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
 
-    await createUser({
-      variables: {
-        name,
-        email
-      },
-      update: (cache, { data: { createUser } }) => {
-        const existingUsers = cache.readQuery({ query: USERS_QUERY });
-
-        if (existingUsers && createUser) {
-          cache.writeQuery({
-            query: USERS_QUERY,
-            data: {
-              Users: [...existingUsers.Users, createUser]
-            }
-          });
+    if (editing) {
+      console.log(editing);
+      await updateUser({
+        variables: {
+          id: editing.id,
+          data: {
+            name,
+            email
+          }
         }
-      }
-    });
+      });
 
-    setName("");
-    setEmail("");
+      //after update finish
+      setEditing(null);
+    } else {
+      await createUser({
+        variables: {
+          name,
+          email
+        },
+        update: (cache, { data: { createUser } }) => {
+          const existingUsers = cache.readQuery({ query: USERS_QUERY });
+
+          if (existingUsers && createUser) {
+            cache.writeQuery({
+              query: USERS_QUERY,
+              data: {
+                Users: [...existingUsers.Users, createUser]
+              }
+            });
+          }
+        }
+      });
+
+      setName("");
+      setEmail("");
+    }
   };
 
   return (
-    <form onSubmit={handleOnSubmit}>
-      {mutationLoading && <p> Loading... </p>}
-      {mutationError && <p> Error... </p>}
+    <div>
+      <form onSubmit={handleOnSubmit}>
+        {mutationLoading && <p> Adding... </p>}
+        {mutationError && <p> Create Error... </p>}
 
-      <input
-        type='text'
-        value={name}
-        placeholder='name..'
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        type='text'
-        value={email}
-        placeholder='email..'
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <button>Submit</button>
-    </form>
+        {updateLoading && <p> Updating... </p>}
+        {updateError && <p> Update Error.. </p>}
+
+        <input
+          type='text'
+          value={name}
+          placeholder='name..'
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          type='text'
+          value={email}
+          placeholder='email..'
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <button>Submit</button>
+      </form>
+    </div>
   );
 };
 
