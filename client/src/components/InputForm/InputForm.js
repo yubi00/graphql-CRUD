@@ -16,7 +16,6 @@ const InputForm = ({ editing, setEditing }) => {
     e.preventDefault();
 
     if (editing) {
-      console.log(editing);
       await updateUser({
         variables: {
           id: editing.id,
@@ -76,6 +75,7 @@ const InputForm = ({ editing, setEditing }) => {
           onChange={(e) => setEmail(e.target.value)}
         />
         <button>Submit</button>
+        {editing && <button onClick={() => setEditing(null)}>Cancel</button>}
       </form>
     </div>
   );
