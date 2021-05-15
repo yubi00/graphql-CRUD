@@ -7,21 +7,28 @@ const InputForm = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
-  const [addUserMutation, { loading: mutationLoading, error: mutationError }] =
+  const [createUser, { loading: mutationLoading, error: mutationError }] =
     useMutation(ADD_MUTATION);
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
 
-    await addUserMutation({
+    await createUser({
       variables: {
         name,
         email
       },
       update: (cache, { data: { createUser } }) => {
-        const data = cache.readQuery({ query: USERS_QUERY });
+        const existingUsers = cache.readQuery({ query: USERS_QUERY });
 
-        cache.writeQuery({ query: USERS_QUERY }, [...data.Users, createUser]);
+        if (existingUsers && createUser) {
+          cache.writeQuery({
+            query: USERS_QUERY,
+            data: {
+              Users: [...existingUsers.Users, createUser]
+            }
+          });
+        }
       }
     });
 

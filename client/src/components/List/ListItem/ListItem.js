@@ -10,7 +10,12 @@ const ListItem = ({ user: { id, name } }) => {
     await deleteUser({
       variables: { id },
       update: (cache, { data: { deleteUser } }) => {
-        cache.writeQuery({ query: USERS_QUERY }, deleteUser);
+        cache.writeQuery({
+          query: USERS_QUERY,
+          data: {
+            Users: [...deleteUser]
+          }
+        });
       }
     });
   };

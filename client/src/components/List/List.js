@@ -1,9 +1,17 @@
+import { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { USERS_QUERY } from "../../graphql/queries";
 import ListItem from "./ListItem/ListItem";
 
 const List = () => {
   const { data, loading, error } = useQuery(USERS_QUERY);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    if (data !== undefined) {
+      setUsers(data.Users);
+    }
+  }, [data]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p> {error.message} </p>;
@@ -11,9 +19,8 @@ const List = () => {
   return (
     <div>
       <h1>Users List</h1>
-      {data.Users.map((user) => (
-        <ListItem key={user.id} user={user} />
-      ))}
+      {users.length > 0 &&
+        users.map((user) => <ListItem key={user.id} user={user} />)}
     </div>
   );
 };
