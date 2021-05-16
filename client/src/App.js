@@ -1,21 +1,24 @@
-import { useState } from "react";
-import "./App.css";
+import { Fragment, useState } from "react";
 import AddUserForm from "./components/InputForm/AddUserForm/AddUserForm";
 import UpdateUserForm from "./components/InputForm/UpdateUserForm/UpdateUserForm";
 import List from "./components/List/List";
+import { GlobalStyle, Wrapper } from "./App.styles";
 
 function App() {
   const [editing, setEditing] = useState(null);
 
   return (
-    <div className='App'>
-      {editing ? (
-        <UpdateUserForm editing={editing} setEditing={setEditing} />
-      ) : (
-        <AddUserForm />
-      )}
-      <List setEditing={setEditing} />
-    </div>
+    <Fragment>
+      <GlobalStyle />
+      <Wrapper>
+        {editing ? (
+          <UpdateUserForm editing={editing} setEditing={setEditing} />
+        ) : (
+          <AddUserForm />
+        )}
+        <List setEditing={setEditing} />
+      </Wrapper>
+    </Fragment>
   );
 }
 

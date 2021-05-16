@@ -1,7 +1,9 @@
 import { useMutation } from "@apollo/client";
 import { useState } from "react";
+import { Button } from "../../elements/Button.styles";
 import { ADD_MUTATION, UPDATE_MUTATION } from "../../graphql/mutations";
 import { USERS_QUERY } from "../../graphql/queries";
+import { Form, Input } from "./InputForm.styles";
 
 const InputForm = ({ editing, setEditing }) => {
   const [name, setName] = useState(editing ? editing.name : "");
@@ -55,28 +57,31 @@ const InputForm = ({ editing, setEditing }) => {
 
   return (
     <div>
-      <form onSubmit={handleOnSubmit}>
-        {mutationLoading && <p> Adding... </p>}
+      <Form onSubmit={handleOnSubmit}>
         {mutationError && <p> Create Error... </p>}
-
-        {updateLoading && <p> Updating... </p>}
         {updateError && <p> Update Error.. </p>}
 
-        <input
+        <Input
           type='text'
           value={name}
           placeholder='name..'
           onChange={(e) => setName(e.target.value)}
         />
-        <input
+        <Input
           type='text'
           value={email}
           placeholder='email..'
           onChange={(e) => setEmail(e.target.value)}
         />
-        <button>Submit</button>
-        {editing && <button onClick={() => setEditing(null)}>Cancel</button>}
-      </form>
+        <Button primary>
+          {mutationLoading
+            ? "Adding..."
+            : updateLoading
+            ? "Updating..."
+            : "Submit"}
+        </Button>
+        {editing && <Button onClick={() => setEditing(null)}>Cancel</Button>}
+      </Form>
     </div>
   );
 };
