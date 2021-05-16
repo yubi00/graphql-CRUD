@@ -1,9 +1,15 @@
 const { ApolloServer } = require("apollo-server-express");
 const { typeDefs } = require("./schema/typedefs");
 const { resolvers } = require("./resolvers/resolvers");
-
+const path = require("path");
 const express = require("express");
 const app = express();
+
+//serve static assets
+app.use(express.static(path.join(__dirname, "client/build")));
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+});
 
 const server = new ApolloServer({
   typeDefs,
